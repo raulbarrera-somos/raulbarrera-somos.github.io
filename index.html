@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuenta para ofrendas y diezmos</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #0074D9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005fa3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cuenta para ofrendas y diezmos</h1>
+    <pre id="datos">
+Banco de Chile
+Cuenta vista: 00-052-22251-74
+RUT: 7.399.921-9
+Correo: raul.barrerac@gmail.com
+    </pre>
+    <button onclick="copiar()">Copiar datos</button>
+
+    <script>
+        function copiar() {
+            const texto = document.getElementById("datos").innerText;
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("Datos copiados");
+            });
+        }
+    </script>
+</body>
+</html>
