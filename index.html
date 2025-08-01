@@ -70,14 +70,14 @@ Cuenta vista: 00-052-22251-74
 RUT: 7.399.921-9
 Correo: raul.barrerac@gmail.com
         </pre>
-        <button onclick="copiar()">Copiar al portapapeles</button>
+        <button onclick="copiar()">Copiar datos</button>
     </div>
 
     <script>
         function copiar() {
             const texto = document.getElementById("datos").innerText;
             navigator.clipboard.writeText(texto).then(() => {
-                alert("Datos copiados al portapapeles");
+                alert("Datos copiado");
             });
         }
     </script>
