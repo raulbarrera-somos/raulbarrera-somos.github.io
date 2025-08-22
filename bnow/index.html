@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo – Cosméticos Flamenco</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fafafa; 
+      --card:#fff; 
+      --ink:#444; 
+      --muted:#777; 
+      --accent:#c084fc; 
+      --chip:#B4485F; 
+      --price:#43332F;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Inter', sans-serif;}
+    header, footer{ text-align:center;padding:32px 20px 8px;background-color:#B4485F;color:#fff;}
+    header img{ max-height:60px;display:block;margin:0 auto 10px;}
+    h1{margin:0 0 6px;font-size:clamp(24px,4vw,36px);color:#fff}
+    p.lead{margin:0;color:#fdf5f6}
+    .search-box{margin:20px auto;max-width:1100px;padding:0 20px}
+    .search-box input{width:100%;padding:12px 16px;font-size:16px;border-radius:12px;border:1px solid #ddd;background:#ffffff;color:var(--ink)}
+    .grid{display:grid;gap:16px;padding:20px;max-width:1200px;margin:auto;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));justify-items:center;align-items:start;}
+    @media (max-width: 360px){.grid{ grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }.card{ max-width:240px; }}
+    .card{background:var(--card);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 12px rgba(0,0,0,.08);transition:transform .2s, box-shadow .2s;width:100%;max-width:280px;min-height:380px;}
+    .card:hover{transform:translateY(-4px);box-shadow:0 8px 18px rgba(0,0,0,.12)}
+    .thumb{aspect-ratio:1/1;background:#fdf5f6;display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:contain}
+    .body{padding:14px; background-color: #fdf5f6}
+    .title{font-weight:700;font-size:17px;margin:0 0 6px;color:#43332F}
+    .desc{font-size:14px;color:#43332F;min-height:42px}
+    .meta{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+    .price{font-weight:800;color:var(--price);font-size:18px}
+    .chip{font-size:12px;color:#fff;background:var(--chip);padding:4px 8px;border-radius:999px}
+    .actions{display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap}
+    .btn{border:none;cursor:pointer;border-radius:12px;padding:10px 12px;font-weight:700;font-size:14px;transition:.2s}
+    .btn.primary{background:#B4485F;color:white}
+    .btn.primary:hover{background:#DCA9A5}
+    .btn.secondary{background:#e5e7eb;color:#333}
+    .btn.secondary:hover{background:#d4d4d8}
+    .qty-control{display:flex;align-items:center;gap:5px}
+    .qty-control button{padding:6px 10px;border:1px solid #ddd;background:#f3f4f6;border-radius:6px;cursor:pointer}
+    .qty-control input{width:50px;text-align:center;border:1px solid #ddd;border-radius:6px;padding:4px}
+    footer{padding:32px 20px 8px;color:#fff}
+    .pagination{text-align:center;margin:20px}
+    .pagination button{margin:0 5px;padding:8px 12px;border:none;border-radius:8px;cursor:pointer;background:#DCA9A5;color:#fff;font-weight:600;}
+    .pagination button.active{background:#B4485F;color:#fff}
+    #cart{position:fixed;top:20px;right:20px;background:#fff;border:1px solid #ddd;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2);width:340px;max-height:70vh;overflow:auto;padding:16px;display:none;flex-direction:column;z-index:1000;}
+    #cart h3{margin:0 0 10px}
+    #cart ul{list-style:none;padding:0;margin:0}
+    #cart ul li{font-size:14px;margin-bottom:8px}
+    #cart .line-controls{display:flex;align-items:center;gap:4px}
+    #cart input.lineQty{width:48px;text-align:center;border:1px solid #ddd;border-radius:6px;padding:4px}
+    #cart .total{font-weight:700;margin-top:10px}
+    #cart .btn{margin-top:10px;width:100%}
+    #cart .small-btn{padding:4px 8px;font-size:12px;margin-left:4px;border:1px solid #ddd;background:#f3f4f6;border-radius:6px;cursor:pointer}
+    #cartClose{position:absolute;top:8px;right:8px;border:none;background:transparent;font-size:16px;cursor:pointer;}
+    #toggleCart{position:fixed;top:20px;right:380px;padding:12px 16px;background:#DCA9A5;color:white;border:none;border-radius:999px;cursor:pointer;font-weight:700;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+    @media(max-width:900px){#toggleCart{right:20px;top:20px}}
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #B4485F;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.2);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 2000;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="img/logo.png" alt="Logo">
+    <h1>Catálogo de cosméticos</h1>
+    <p class="lead">Productos pensados en ti</p>
+  </header>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Buscar productos..." />
+  </div>
+
+  <section class="grid" id="productGrid"></section>
+
+  <div class="pagination" id="pagination"></div>
+
+  <footer>
+    <p>
+      ¿Dudas o consultas?
+      <span id="whatsappLink" style="margin-left:15px;"></span>
+    </p>
+  </footer>
+
+  <!-- Carrito -->
+  <button id="toggleCart">🛒</button>
+  <div id="cart">
+    <button id="cartClose">✖</button>
+    <h3>Carrito de Cotización</h3>
+    <ul id="cartItems"></ul>
+    <p class="total">Total: <strong id="cartTotal">$0</strong></p>
+    <button class="btn primary" id="copyCart">Copiar pedido</button>
+    <button class="btn secondary" id="clearCart">Vaciar Carrito</button>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const ALL_PRODUCTS=[
+      {name:"Desmaquillante de Rosas",desc:"Limpia suavemente y calma la piel.",price:5990,img:"img/desmaquilla.jpeg"},
+      {name:"Mascarilla Aloe Vera",desc:"Hidratación refrescante con aloe.",price:2990,img:"img/aloe.jpeg"},
+      {name:"Mascarilla Fresa",desc:"Antioxidante con extracto de fresa.",price:2990,img:"img/fresa.jpeg"},
+      {name:"Limpiador Facial 24K",desc:"Gel con partículas doradas iluminadoras.",price:7990,img:"img/24k.jpeg"},
+      {name:"Mascarilla Manos Rosas",desc:"Guantes nutritivos de rosas.",price:3590,img:"img/manos.jpeg"},
+      {name:"Mascarilla Pies Lavanda",desc:"Hidratación profunda con lavanda.",price:4190,img:"img/pies.jpeg"},
+      {name:"Sérum Ácido Hialurónico",desc:"Hidratación intensiva.",price:9990,img:"img/serum.jpeg"},
+      {name:"Tónico de Rosas",desc:"Refresca y tonifica.",price:4990,img:"img/tonico.jpeg"},
+      {name:"Crema Hidratante Día",desc:"Protección diaria ligera.",price:6990,img:"img/crema_dia.jpeg"},
+      {name:"Crema Nutritiva Noche",desc:"Repara mientras duermes.",price:7990,img:"img/crema_noche.jpeg"},
+      {name:"Contorno de Ojos",desc:"Reduce bolsas y ojeras.",price:8990,img:"img/ojos.jpeg"},
+      {name:"Mascarilla Arcilla Verde",desc:"Purifica y controla grasa.",price:5990,img:"img/arcilla.jpeg"},
+      {name:"Exfoliante Suave",desc:"Elimina impurezas delicadamente.",price:5490,img:"img/exfoliante.jpeg"},
+      {name:"BB Cream Hidratante",desc:"Unifica tono y cuida la piel.",price:9990,img:"img/bbcream.jpeg"},
+      {name:"Labial Rosa Suave",desc:"Color natural y humectación.",price:3990,img:"img/labial.jpeg"},
+      {name:"Gloss Transparente",desc:"Brillo ligero para labios.",price:3490,img:"img/gloss.jpeg"},
+      {name:"Mascarilla de Pepino",desc:"Refrescante y calmante.",price:2990,img:"img/pepino.jpeg"},
+      {name:"Crema de Manos Karité",desc:"Nutrición profunda.",price:2990,img:"img/karite.jpeg"},
+      {name:"Protector Solar SPF50",desc:"Alta protección solar.",price:11990,img:"img/spf50.jpeg"},
+      {name:"Agua Micelar",desc:"Limpieza suave sin enjuague.",price:5990,img:"img/micelar.jpeg"}
+    ];
+
+    const $ = sel => document.querySelector(sel);
+    const CLP = new Intl.NumberFormat('es-CL', {style:'currency', currency:'CLP', maximumFractionDigits:0});
+    const formatCLP = n => CLP.format(n).replace(/\s/g,'');
+
+    const productGrid = $('#productGrid');
+    const pagination = $('#pagination');
+    const searchInput = $('#searchInput');
+    let searchQuery = '';
+    let currentPage = 1;
+    const perPage = 10;
+
+    function cardTemplate(p){
+      const article = document.createElement('article');
+      article.className = 'card';
+      article.innerHTML = `
+        <div class="thumb"><img src="${p.img}" alt=""></div>
+        <div class="body">
+          <h3 class="title">${p.name}</h3>
+          <p class="desc">${p.desc}</p>
+          <div class="meta"><span class="chip">FLAMENCO</span><span class="price">${formatCLP(p.price)}</span></div>
+          <div class="actions">
+            <div class="qty-control">
+              <button class="minus" type="button">-</button>
+              <input type="number" value="1" min="1" class="qty">
+              <button class="plus" type="button">+</button>
+            </div>
+            <button class="btn primary addCart" type="button">Agregar</button>
+          </div>
+        </div>`;
+      const qtyInput = article.querySelector('.qty');
+      article.querySelector('.plus').addEventListener('click',()=> qtyInput.value=(+qtyInput.value||1)+1);
+      article.querySelector('.minus').addEventListener('click',()=> qtyInput.value=Math.max(1,(+qtyInput.value||1)-1));
+      article.querySelector('.addCart').addEventListener('click',()=>{
+        const qty=Math.max(1,parseInt(qtyInput.value)||1);
+        addToCart(p,qty);
+      });
+      return article;
+    }
+
+    function getFiltered(){
+      if(!searchQuery) return ALL_PRODUCTS;
+      const q = searchQuery.toLowerCase();
+      return ALL_PRODUCTS.filter(p => (p.name+' '+p.desc).toLowerCase().includes(q));
+    }
+
+    function renderProducts(){
+      const filtered=getFiltered();
+      const totalPages=Math.max(1,Math.ceil(filtered.length/perPage));
+      if(currentPage>totalPages) currentPage=totalPages;
+      const start=(currentPage-1)*perPage;
+      const pageItems=filtered.slice(start,start+perPage);
+      productGrid.innerHTML='';
+      pageItems.forEach(p=>productGrid.appendChild(cardTemplate(p)));
+      renderPagination(filtered.length,totalPages);
+    }
+
+    function renderPagination(totalItems,totalPages){
+      pagination.innerHTML='';
+      if(totalItems<=perPage) return;
+      for(let i=1;i<=totalPages;i++){
+        const btn=document.createElement('button');
+        btn.textContent=i;
+        if(i===currentPage) btn.classList.add('active');
+        btn.addEventListener('click',()=>{currentPage=i;renderProducts();});
+        pagination.appendChild(btn);
+      }
+    }
+
+    searchInput.addEventListener('input',()=>{
+      searchQuery=searchInput.value.trim();
+      currentPage=1;
+      renderProducts();
+    });
+
+    let cart=[];
+    const cartBtn=$('#toggleCart');
+    const cartBox=$('#cart');
+    const cartItems=$('#cartItems');
+    const cartTotal=$('#cartTotal');
+    const copyCart=$('#copyCart');
+    const clearCart=$('#clearCart');
+    const cartClose=$('#cartClose');
+
+    function addToCart(product,qty=1){
+      const found=cart.find(i=>i.name===product.name);
+      if(found){found.qty+=qty;}
+      else{cart.push({name:product.name,price:product.price,qty});}
+      renderCart();
+      cartBox.style.display='flex';
+    }
+
+    function renderCart(){
+      cartItems.innerHTML='';
+      let total=0;
+      cart.forEach((item,idx)=>{
+        const subtotal=item.price*item.qty;
+        total+=subtotal;
+        const li=document.createElement('li');
+        li.innerHTML=`
+          <div>
+            <strong>${item.name}</strong><br>
+            Unitario: ${formatCLP(item.price)}<br>
+            Cantidad: ${item.qty}<br>
+            Total: ${formatCLP(subtotal)}
+          </div>
+          <div class="line-controls">
+            <button class="small-btn" data-act="minus" data-idx="${idx}">-</button>
+            <input type="number" class="lineQty" min="1" value="${item.qty}" data-idx="${idx}">
+            <button class="small-btn" data-act="plus" data-idx="${idx}">+</button>
+            <button class="small-btn" data-act="remove" data-idx="${idx}">x</button>
+          </div>`;
+        cartItems.appendChild(li);
+      });
+      cartTotal.textContent=formatCLP(total);
+
+      cartItems.querySelectorAll('button.small-btn').forEach(btn=>{
+        const idx=+btn.dataset.idx;
+        btn.onclick=()=>{
+          const act=btn.dataset.act;
+          if(act==='minus'){cart[idx].qty=Math.max(1,cart[idx].qty-1);}
+          if(act==='plus'){cart[idx].qty+=1;}
+          if(act==='remove'){cart.splice(idx,1);}
+          renderCart();
+        };
+      });
+      cartItems.querySelectorAll('input.lineQty').forEach(inp=>{
+        inp.onchange=()=>{
+          const idx=+inp.dataset.idx;
+          const val=Math.max(1,parseInt(inp.value)||1);
+          cart[idx].qty=val;
+          renderCart();
+        };
+      });
+    }
+
+    clearCart.addEventListener('click',()=>{cart=[];renderCart();});
+    cartBtn.addEventListener('click',()=>{cartBox.style.display=cartBox.style.display==='flex'?'none':'flex';});
+    cartClose.addEventListener('click',()=>{cartBox.style.display='none';});
+
+    copyCart.addEventListener('click',()=>{
+      if(cart.length===0){ showToast('El carrito está vacío ❌'); return; }
+      const lines=cart.map(i=>`${i.name} — Cantidad: ${i.qty}, Unitario: ${formatCLP(i.price)}, Total: ${formatCLP(i.price*i.qty)}`);
+      const total=cart.reduce((sum,i)=>sum+i.price*i.qty,0);
+      const text=`Mi cotización:\n${lines.join('\n')}\n\nTotal: ${formatCLP(total)}`;
+      navigator.clipboard.writeText(text).then(()=> showToast('Pedido copiado, pegalo y envíalo por WhatsApp ✅'));
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(()=> toast.classList.remove("show"), 3000);
+    }
+
+    /* --- Enlace WhatsApp en footer --- */
+    (function(){
+      const encoded = "NTY5ODcyNjA1NDQ=";
+      const number = atob(encoded); 
+      const link = document.createElement("a");
+      link.href = "https://wa.me/" + number;
+      link.target = "_blank";
+      link.style.marginLeft = "8px";
+      link.style.color = "white";
+      link.style.textDecoration = "none";
+      link.innerHTML = '<img src="https://img.icons8.com/color/24/000000/whatsapp.png" alt="WhatsApp" style="vertical-align:middle;margin-right:5px;"> Contáctanos';
+      document.getElementById("whatsappLink").appendChild(link);
+    })();
+
+    renderProducts();
+  </script>
+</body>
+</html>
